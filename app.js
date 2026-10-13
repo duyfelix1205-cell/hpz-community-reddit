@@ -28,7 +28,7 @@ function postCard(post){
   var comments=commentsFor(post.id),liked=state.liked.indexOf(post.id)>-1,expanded=!!openComments[post.id];
   var html='<article class="hpz-card hpz-community-post" data-post="'+post.id+'"><div class="hpz-community-post__head"><div class="hpz-community-post__author"><b>'+esc(post.author)+'</b><small>'+date(post.t)+'</small></div><span class="hpz-status">Cộng đồng</span></div>';
   if(post.title)html+='<h2>'+esc(post.title)+'</h2>';
-  html+='<div class="hpz-community-post__body">'+esc(post.body)+'</div><div class="hpz-community-post__meta"><button data-action="like" data-id="'+post.id+'" aria-pressed="'+liked+'">'+(liked?'♥':'♡')+' '+(post.likes+(liked?1:0))+'</button><button data-action="comments" data-id="'+post.id+'">Bình luận '+comments.length+'</button></div>';
+  html+='<div class="hpz-community-post__body">'+esc(post.body)+'</div><div class="hpz-community-post__meta"><button data-action="like" data-id="'+post.id+'" aria-pressed="'+liked+'">'+(liked?'♥':'♡')+' '+(post.likes+(liked?1:0))+'</button><button data-action="comments" data-id="'+post.id+'">Bình luận '+comments.length+'</button><button type="button" class="hpz-post-delete" data-action="delete-post" data-id="'+post.id+'" aria-label="Xoá bài viết" title="Xoá bài viết" style="margin-left:auto;padding:4px 12px;min-height:28px;border:1px solid rgba(255,120,120,.5);border-radius:999px;background:rgba(255,80,80,.12);color:#ffb4b4">Xoá bài</button></div>';
   if(expanded){html+='<div class="hpz-community-comments">';
     if(comments.length)comments.forEach(function(comment){html+=commentItem(comment)});
     else html+='<div class="hpz-empty"><b>Chưa có bình luận</b></div>';
@@ -38,9 +38,17 @@ function postCard(post){
 }
 function render(){var feed=$('community-feed');if(!state.posts.length){feed.innerHTML='<section class="hpz-card"><div class="hpz-empty"><b>Community chưa có bài public</b><p>Anh có thể đăng bài đầu tiên bằng tài khoản đã liên kết customer_id.</p></div></section>';return}feed.innerHTML=state.posts.slice().sort(function(a,b){return b.t-a.t}).map(postCard).join('')}
 function modal(open){$('composer-backdrop').hidden=!open;document.body.style.overflow=open?'hidden':'';if(open)setTimeout(function(){var input=$('composer-form').querySelector('input');if(input)input.focus()},0)}
+function deletePost(id){
+  var removed=commentsFor(id).map(function(item){return item.id});
+  state.posts=state.posts.filter(function(item){return item.id!==id});
+  state.comments=state.comments.filter(function(item){return item.post!==id});
+  state.liked=state.liked.filter(function(pid){return pid!==id});
+  state.likedComments=state.likedComments.filter(function(cid){return removed.indexOf(cid)===-1});
+  delete openComments[id];save();render()
+}
 document.addEventListener('click',function(event){
   var action=event.target.closest('[data-action]');
-  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='like-comment'){var cpos=state.likedComments.indexOf(id);if(cpos>-1)state.likedComments.splice(cpos,1);else state.likedComments.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}else if(type==='delete-comment'){if(window.confirm('Xoá bình luận này?')){state.comments=state.comments.filter(function(item){return item.id!==id});state.likedComments=state.likedComments.filter(function(cid){return cid!==id});save();render()}}return}
+  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='like-comment'){var cpos=state.likedComments.indexOf(id);if(cpos>-1)state.likedComments.splice(cpos,1);else state.likedComments.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}else if(type==='delete-comment'){if(window.confirm('Xoá bình luận này?')){state.comments=state.comments.filter(function(item){return item.id!==id});state.likedComments=state.likedComments.filter(function(cid){return cid!==id});save();render()}}else if(type==='delete-post'){if(window.confirm('Xoá bài viết này cùng toàn bộ bình luận?'))deletePost(id)}return}
   if(event.target.closest('a[href="#"]'))event.preventDefault();
 });
 document.addEventListener('submit',function(event){
