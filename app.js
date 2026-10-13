@@ -26,7 +26,7 @@ function postCard(post){
   if(post.title)html+='<h2>'+esc(post.title)+'</h2>';
   html+='<div class="hpz-community-post__body">'+esc(post.body)+'</div><div class="hpz-community-post__meta"><button data-action="like" data-id="'+post.id+'" aria-pressed="'+liked+'">'+(liked?'♥':'♡')+' '+(post.likes+(liked?1:0))+'</button><button data-action="comments" data-id="'+post.id+'">Bình luận '+comments.length+'</button></div>';
   if(expanded){html+='<div class="hpz-community-comments">';
-    if(comments.length)comments.forEach(function(comment){html+='<div class="hpz-community-comments__item"><b>'+esc(comment.author)+'</b><p>'+esc(comment.body)+'</p><small>'+date(comment.t)+'</small></div>'});
+    if(comments.length)comments.forEach(function(comment){html+='<div class="hpz-community-comments__item"><b>'+esc(comment.author)+'</b><p>'+esc(comment.body)+'</p><small>'+date(comment.t)+'</small> <button type="button" class="hpz-comment-delete" data-action="delete-comment" data-id="'+comment.id+'" aria-label="Xoá bình luận" title="Xoá bình luận" style="margin-left:8px;padding:2px 10px;min-height:28px;border:1px solid rgba(255,120,120,.5);border-radius:999px;background:rgba(255,80,80,.12);color:#ffb4b4;font-size:12px;cursor:pointer">Xoá</button></div>'});
     else html+='<div class="hpz-empty"><b>Chưa có bình luận</b></div>';
     html+='<form data-comment="'+post.id+'"><label class="hpz-field"><span>Bình luận</span><textarea name="body" maxlength="1200" placeholder="Viết phản hồi…" required></textarea></label><button class="hpz-btn hpz-btn--primary">Gửi bình luận</button></form></div>';
   }
@@ -36,7 +36,7 @@ function render(){var feed=$('community-feed');if(!state.posts.length){feed.inne
 function modal(open){$('composer-backdrop').hidden=!open;document.body.style.overflow=open?'hidden':'';if(open)setTimeout(function(){var input=$('composer-form').querySelector('input');if(input)input.focus()},0)}
 document.addEventListener('click',function(event){
   var action=event.target.closest('[data-action]');
-  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}return}
+  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}else if(type==='delete-comment'){if(window.confirm('Xoá bình luận này?')){state.comments=state.comments.filter(function(item){return item.id!==id});save();render()}}return}
   if(event.target.closest('a[href="#"]'))event.preventDefault();
 });
 document.addEventListener('submit',function(event){
