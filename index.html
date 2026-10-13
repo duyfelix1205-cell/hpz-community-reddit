@@ -1,24 +1,99 @@
 <!doctype html>
 <html lang="vi">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="description" content="HPZ Community - diễn đàn cá cảnh theo mô hình cộng đồng chủ đề, bình chọn và bình luận phân nhánh.">
-<title>HPZ Community</title>
-<link rel="preconnect" href="https://api.fontshare.com">
-<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="./styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="HPZ Community - cộng đồng người chơi cá trong hệ sinh thái HPZ Aquaroom.">
+  <meta name="theme-color" content="#06121f">
+  <title>Community — HPZ Aquaroom</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css">
 </head>
 <body>
-<a class="skip" href="#main">Bỏ qua điều hướng</a>
-<header class="top" id="top"></header>
-<div class="layout">
-  <nav class="left" id="left" aria-label="Cộng đồng"></nav>
-  <main id="main" class="main"></main>
-  <aside class="right" id="right"></aside>
-</div>
-<dialog id="composer"></dialog>
-<noscript><p style="padding:2rem">Cần bật JavaScript để xem HPZ Community.</p></noscript>
-<script src="./app.js"></script>
+  <a class="hpz-skip" href="#community-main">Bỏ qua điều hướng</a>
+  <div class="hpz-app">
+    <div id="aquarium-bg" aria-hidden="true"></div>
+    <header class="hpz-header">
+      <div class="hpz-container hpz-header__inner">
+        <a class="hpz-brand" href="#" aria-label="HPZ Aquaroom">
+          <span class="hpz-brand__mark"><img src="https://raw.githubusercontent.com/duyfelix1205-cell/hpzfull/main/frontend/public/assets/hpz/logo.png" alt=""></span>
+          <span><b>HPZ AQUAROOM</b><small>CUSTOMER ECOSYSTEM</small></span>
+        </a>
+        <nav class="hpz-header__nav" aria-label="Điều hướng chính">
+          <a href="#">Trang chủ</a><a href="#">Cá cảnh</a><a href="#">Bể cá</a><a href="#">Nhật Báo</a><a href="#">HPZWiki</a><a href="#">AquaCare</a><a href="#">Game</a><a href="#">Market</a><a class="active" href="#">Community</a>
+        </nav>
+        <div class="hpz-header__actions">
+          <details class="hpz-more-nav">
+            <summary>Thêm</summary>
+            <div class="hpz-more-nav__panel"><a href="#">Chính sách</a><a href="#">Liên hệ</a></div>
+          </details>
+          <a class="hpz-icon-link" href="#" aria-label="Tìm kiếm">⌕</a>
+          <a class="hpz-account-link" href="#">My HPZ</a>
+          <details class="hpz-mobile-menu" id="mobile-menu">
+            <summary aria-label="Mở menu">☰</summary>
+            <div class="hpz-mobile-menu__panel">
+              <a href="#">Trang chủ</a><a href="#">Cá cảnh</a><a href="#">Bể cá</a><a href="#">Nhật Báo</a><a href="#">HPZWiki</a><a href="#">AquaCare</a><a href="#">Game</a><a href="#">Market</a><a class="active" href="#">Community</a><a href="#">Chính sách</a><a href="#">Liên hệ</a><a href="#">My HPZ</a>
+            </div>
+          </details>
+        </div>
+      </div>
+    </header>
+
+    <main class="hpz-main" id="community-main">
+      <div class="hpz-container">
+        <section class="hpz-page-head">
+          <div class="hpz-page-head__copy">
+            <span class="hpz-eyebrow">HPZ COMMUNITY</span>
+            <h1>Cộng đồng người chơi cá</h1>
+            <p>Chia sẻ trải nghiệm thật trong hệ sinh thái HPZ. V1 ưu tiên bài viết gắn với bể, Wiki và Market thay vì xây một mạng xã hội chung chung.</p>
+          </div>
+          <div class="hpz-page-head__actions"><button class="hpz-btn hpz-btn--primary" id="open-composer">+ Viết bài</button></div>
+        </section>
+
+        <div class="hpz-grid hpz-grid--2 hpz-section">
+          <section class="hpz-card hpz-card--hero">
+            <div class="hpz-card-head"><div><span class="hpz-eyebrow">ECOSYSTEM-NATIVE</span><h2>Chia sẻ đúng ngữ cảnh</h2></div></div>
+            <p>Community được thiết kế để sau này chia sẻ trực tiếp bể AquaCare, bài Wiki hoặc tin Market bằng stable ID, không sao chép dữ liệu master.</p>
+          </section>
+          <section class="hpz-card">
+            <div class="hpz-card-head"><div><span class="hpz-eyebrow">NGUYÊN TẮC V1</span><h2>Đơn giản và có kiểm soát</h2></div></div>
+            <p class="hpz-muted">Bài viết, bình luận và reaction cơ bản; chưa mở chat realtime, feed thuật toán hay cơ chế social phức tạp.</p>
+          </section>
+        </div>
+
+        <div id="community-feed" class="hpz-stack" aria-live="polite"></div>
+      </div>
+    </main>
+
+    <footer class="hpz-footer">
+      <div class="hpz-container">
+        <div class="hpz-footer__business">HPZ Aquaroom · Hà Nội · <a href="https://www.facebook.com/hpzaquaroom" target="_blank" rel="noopener noreferrer">Facebook</a><br>© 2026 HPZ Aquaroom.</div>
+        <nav class="hpz-footer__links" aria-label="Liên kết website"><a href="#">Cá cảnh</a><a href="#">Bể cá</a><a href="#">Nhật Báo</a><a href="#">HPZWiki</a><a href="#">AquaCare</a><a href="#">Game</a><a href="#">Market</a><a href="#">Community</a><a href="#">Chính sách</a><a href="#">Liên hệ</a></nav>
+      </div>
+    </footer>
+
+    <nav class="hpz-bottom-nav" aria-label="Điều hướng mobile">
+      <a href="#"><i>⌂</i><span>Home</span></a><a href="#"><i>≈</i><span>Care</span></a><a href="#"><i>🎮</i><span>Game</span></a><a href="#"><i>◇</i><span>Market</span></a><a href="#"><i>●</i><span>Me</span></a>
+    </nav>
+  </div>
+
+  <div class="hpz-modal-backdrop" id="composer-backdrop" hidden>
+    <section class="hpz-modal" role="dialog" aria-modal="true" aria-labelledby="composer-title">
+      <button class="hpz-modal__close" id="close-composer" aria-label="Đóng">×</button>
+      <div class="hpz-modal__mark">HPZ</div>
+      <h2 id="composer-title">Viết bài Community</h2>
+      <p class="hpz-modal__subtitle">Bài đăng sẽ gắn với customer_id của tài khoản hiện tại.</p>
+      <form id="composer-form">
+        <label class="hpz-field"><span>Tiêu đề</span><input name="title" maxlength="180" placeholder="Có thể để trống"></label>
+        <label class="hpz-field"><span>Nội dung *</span><textarea name="body" maxlength="2000" required></textarea></label>
+        <div class="hpz-actions"><button class="hpz-btn hpz-btn--secondary" type="button" id="cancel-composer">Hủy</button><button class="hpz-btn hpz-btn--primary">Đăng bài</button></div>
+      </form>
+    </section>
+  </div>
+
+  <noscript><p class="hpz-noscript">Cần bật JavaScript để sử dụng HPZ Community.</p></noscript>
+  <script src="./app.js" defer></script>
 </body>
 </html>
