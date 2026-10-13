@@ -10,6 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700;800;900&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./styles.css">
+  <link rel="stylesheet" href="./topics.css">
 </head>
 <body>
   <a class="hpz-skip" href="#community-main">Bỏ qua điều hướng</a>
@@ -52,18 +53,43 @@
           <div class="hpz-page-head__actions"><button class="hpz-btn hpz-btn--primary" id="open-composer">+ Viết bài</button></div>
         </section>
 
-        <div class="hpz-grid hpz-grid--2 hpz-section">
-          <section class="hpz-card hpz-card--hero">
-            <div class="hpz-card-head"><div><span class="hpz-eyebrow">ECOSYSTEM-NATIVE</span><h2>Chia sẻ đúng ngữ cảnh</h2></div></div>
-            <p>Community được thiết kế để sau này chia sẻ trực tiếp bể AquaCare, bài Wiki hoặc tin Market bằng stable ID, không sao chép dữ liệu master.</p>
-          </section>
-          <section class="hpz-card">
-            <div class="hpz-card-head"><div><span class="hpz-eyebrow">NGUYÊN TẮC V1</span><h2>Đơn giản và có kiểm soát</h2></div></div>
-            <p class="hpz-muted">Bài viết, bình luận và reaction cơ bản; chưa mở chat realtime, feed thuật toán hay cơ chế social phức tạp.</p>
-          </section>
-        </div>
+        <div class="hpz-layout">
+          <aside class="hpz-side" aria-label="Chủ đề Community">
+            <details class="hpz-side__section" open>
+              <summary>Bảng tin</summary>
+              <div class="hpz-side__list">
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="all" aria-current="true"><span class="hpz-side__icon">🏠</span><span class="hpz-side__label">Tất cả bài viết</span><span class="hpz-side__count" data-count="all">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="liked"><span class="hpz-side__icon">♥</span><span class="hpz-side__label">Bài đã thích</span><span class="hpz-side__count" data-count="liked">0</span></button>
+              </div>
+            </details>
+            <details class="hpz-side__section" open>
+              <summary>Chủ đề</summary>
+              <div class="hpz-side__list">
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="benh"><span class="hpz-side__icon">🩺</span><span class="hpz-side__label">Bệnh của cá</span><span class="hpz-side__count" data-count="benh">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="nuoc"><span class="hpz-side__icon">💧</span><span class="hpz-side__label">Chăm sóc nước</span><span class="hpz-side__count" data-count="nuoc">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="setup"><span class="hpz-side__icon">🧰</span><span class="hpz-side__label">Set up bể mới</span><span class="hpz-side__count" data-count="setup">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="kythuat"><span class="hpz-side__icon">⚙️</span><span class="hpz-side__label">Kỹ thuật bể</span><span class="hpz-side__count" data-count="kythuat">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="ca"><span class="hpz-side__icon">🐟</span><span class="hpz-side__label">Chọn &amp; nuôi cá</span><span class="hpz-side__count" data-count="ca">0</span></button>
+                <button type="button" class="hpz-side__item" data-action="topic" data-id="hoidap"><span class="hpz-side__icon">💬</span><span class="hpz-side__label">Hỏi đáp chung</span><span class="hpz-side__count" data-count="hoidap">0</span></button>
+              </div>
+            </details>
+          </aside>
 
-        <div id="community-feed" class="hpz-stack" aria-live="polite"></div>
+          <div class="hpz-layout__main">
+            <div class="hpz-grid hpz-grid--2 hpz-section">
+              <section class="hpz-card hpz-card--hero">
+                <div class="hpz-card-head"><div><span class="hpz-eyebrow">ECOSYSTEM-NATIVE</span><h2>Chia sẻ đúng ngữ cảnh</h2></div></div>
+                <p>Community được thiết kế để sau này chia sẻ trực tiếp bể AquaCare, bài Wiki hoặc tin Market bằng stable ID, không sao chép dữ liệu master.</p>
+              </section>
+              <section class="hpz-card">
+                <div class="hpz-card-head"><div><span class="hpz-eyebrow">NGUYÊN TẮC V1</span><h2>Đơn giản và có kiểm soát</h2></div></div>
+                <p class="hpz-muted">Bài viết, bình luận và reaction cơ bản; chưa mở chat realtime, feed thuật toán hay cơ chế social phức tạp.</p>
+              </section>
+            </div>
+
+            <div id="community-feed" class="hpz-stack" aria-live="polite"></div>
+          </div>
+        </div>
       </div>
     </main>
 
@@ -86,6 +112,16 @@
       <h2 id="composer-title">Viết bài Community</h2>
       <p class="hpz-modal__subtitle">Bài đăng sẽ gắn với customer_id của tài khoản hiện tại.</p>
       <form id="composer-form">
+        <label class="hpz-field"><span>Chủ đề</span>
+          <select name="topic">
+            <option value="benh">Bệnh của cá</option>
+            <option value="nuoc">Chăm sóc nước</option>
+            <option value="setup">Set up bể mới</option>
+            <option value="kythuat">Kỹ thuật bể</option>
+            <option value="ca">Chọn &amp; nuôi cá</option>
+            <option value="hoidap" selected>Hỏi đáp chung</option>
+          </select>
+        </label>
         <label class="hpz-field"><span>Tiêu đề</span><input name="title" maxlength="180" placeholder="Có thể để trống"></label>
         <label class="hpz-field"><span>Nội dung *</span><textarea name="body" maxlength="2000" required></textarea></label>
         <div class="hpz-actions"><button class="hpz-btn hpz-btn--secondary" type="button" id="cancel-composer">Hủy</button><button class="hpz-btn hpz-btn--primary">Đăng bài</button></div>
