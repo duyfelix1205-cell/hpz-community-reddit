@@ -9,24 +9,28 @@ function seed(){return{me:'ban_doc',posts:[
   {id:'p2',author:'HPZ Staff',title:'Checklist đón betta mới về: 7 bước trong 24 giờ đầu',body:'1. Chuẩn bị bể cách ly 10–15 lít.\n2. Giữ nhiệt độ ổn định 26–28°C.\n3. Hòa nước từ từ 30–45 phút.\n4. Quan sát vây, mang và phản xạ.\n5. Ghi lại ngày nhập để theo dõi.',likes:132,t:ago(600)},
   {id:'p3',author:'Anh Khoa',title:'Cá neon bơi lờ đờ, thân có đốm trắng nhỏ',body:'Bể 40 lít, 12 con neon, mới thêm cá hôm kia mà không cách ly. Hôm nay 3 con có đốm trắng li ti. Mình nên nâng nhiệt hay dùng thuốc ngay?',likes:21,t:ago(40)}
 ],comments:[
-  {id:'c1',post:'p1',author:'HPZ Staff',body:'Bể 60cm mới chơi nên chọn layout đảo hoặc tam giác nhẹ. Nhớ chừa vùng nền trống để cây tiền cảnh lan.',t:ago(80)},
-  {id:'c2',post:'p1',author:'Minh Thủy',body:'Cảm ơn anh! Mình sẽ thử layout tam giác lệch trái.',t:ago(70)},
-  {id:'c3',post:'p3',author:'Bích Ngọc',body:'Có vẻ là bệnh đốm trắng. Nên cách ly ngay và dùng thuốc chuyên dụng đúng liều.',t:ago(30)}
-],liked:[]}}
-function load(){try{var value=JSON.parse(localStorage.getItem(STORE));if(value&&value.posts&&value.comments)return value}catch(e){}return seed()}
+  {id:'c1',post:'p1',author:'HPZ Staff',body:'Bể 60cm mới chơi nên chọn layout đảo hoặc tam giác nhẹ. Nhớ chừa vùng nền trống để cây tiền cảnh lan.',likes:12,t:ago(80)},
+  {id:'c2',post:'p1',author:'Minh Thủy',body:'Cảm ơn anh! Mình sẽ thử layout tam giác lệch trái.',likes:3,t:ago(70)},
+  {id:'c3',post:'p3',author:'Bích Ngọc',body:'Có vẻ là bệnh đốm trắng. Nên cách ly ngay và dùng thuốc chuyên dụng đúng liều.',likes:8,t:ago(30)}
+],liked:[],likedComments:[]}}
+function load(){try{var value=JSON.parse(localStorage.getItem(STORE));if(value&&value.posts&&value.comments){if(!Array.isArray(value.liked))value.liked=[];if(!Array.isArray(value.likedComments))value.likedComments=[];return value}}catch(e){}return seed()}
 var state=load();var openComments={};
 function save(){try{localStorage.setItem(STORE,JSON.stringify(state))}catch(e){}}
 function esc(value){return String(value==null?'':value).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]})}
 function uid(prefix){return prefix+Date.now().toString(36)+Math.random().toString(36).slice(2,6)}
 function date(value){return new Date(value).toLocaleString('vi-VN')}
 function commentsFor(postId){return state.comments.filter(function(item){return item.post===postId})}
+function commentItem(comment){
+  var liked=state.likedComments.indexOf(comment.id)>-1,count=(comment.likes||0)+(liked?1:0);
+  return '<div class="hpz-community-comments__item"><b>'+esc(comment.author)+'</b><p>'+esc(comment.body)+'</p><small>'+date(comment.t)+'</small> <button type="button" class="hpz-comment-like" data-action="like-comment" data-id="'+comment.id+'" aria-pressed="'+liked+'" aria-label="'+(liked?'Bỏ thích bình luận':'Thích bình luận')+'" style="margin-left:8px;padding:2px 10px;min-height:28px;border:1px solid '+(liked?'rgba(255,107,129,.8)':'rgba(255,255,255,.28)')+';border-radius:999px;background:'+(liked?'rgba(255,107,129,.18)':'transparent')+';color:'+(liked?'#ff8da1':'inherit')+';font-size:12px;cursor:pointer">'+(liked?'♥':'♡')+' '+count+'</button><button type="button" class="hpz-comment-delete" data-action="delete-comment" data-id="'+comment.id+'" aria-label="Xoá bình luận" title="Xoá bình luận" style="margin-left:8px;padding:2px 10px;min-height:28px;border:1px solid rgba(255,120,120,.5);border-radius:999px;background:rgba(255,80,80,.12);color:#ffb4b4;font-size:12px;cursor:pointer">Xoá</button></div>'
+}
 function postCard(post){
   var comments=commentsFor(post.id),liked=state.liked.indexOf(post.id)>-1,expanded=!!openComments[post.id];
   var html='<article class="hpz-card hpz-community-post" data-post="'+post.id+'"><div class="hpz-community-post__head"><div class="hpz-community-post__author"><b>'+esc(post.author)+'</b><small>'+date(post.t)+'</small></div><span class="hpz-status">Cộng đồng</span></div>';
   if(post.title)html+='<h2>'+esc(post.title)+'</h2>';
   html+='<div class="hpz-community-post__body">'+esc(post.body)+'</div><div class="hpz-community-post__meta"><button data-action="like" data-id="'+post.id+'" aria-pressed="'+liked+'">'+(liked?'♥':'♡')+' '+(post.likes+(liked?1:0))+'</button><button data-action="comments" data-id="'+post.id+'">Bình luận '+comments.length+'</button></div>';
   if(expanded){html+='<div class="hpz-community-comments">';
-    if(comments.length)comments.forEach(function(comment){html+='<div class="hpz-community-comments__item"><b>'+esc(comment.author)+'</b><p>'+esc(comment.body)+'</p><small>'+date(comment.t)+'</small> <button type="button" class="hpz-comment-delete" data-action="delete-comment" data-id="'+comment.id+'" aria-label="Xoá bình luận" title="Xoá bình luận" style="margin-left:8px;padding:2px 10px;min-height:28px;border:1px solid rgba(255,120,120,.5);border-radius:999px;background:rgba(255,80,80,.12);color:#ffb4b4;font-size:12px;cursor:pointer">Xoá</button></div>'});
+    if(comments.length)comments.forEach(function(comment){html+=commentItem(comment)});
     else html+='<div class="hpz-empty"><b>Chưa có bình luận</b></div>';
     html+='<form data-comment="'+post.id+'"><label class="hpz-field"><span>Bình luận</span><textarea name="body" maxlength="1200" placeholder="Viết phản hồi…" required></textarea></label><button class="hpz-btn hpz-btn--primary">Gửi bình luận</button></form></div>';
   }
@@ -36,12 +40,12 @@ function render(){var feed=$('community-feed');if(!state.posts.length){feed.inne
 function modal(open){$('composer-backdrop').hidden=!open;document.body.style.overflow=open?'hidden':'';if(open)setTimeout(function(){var input=$('composer-form').querySelector('input');if(input)input.focus()},0)}
 document.addEventListener('click',function(event){
   var action=event.target.closest('[data-action]');
-  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}else if(type==='delete-comment'){if(window.confirm('Xoá bình luận này?')){state.comments=state.comments.filter(function(item){return item.id!==id});save();render()}}return}
+  if(action){var id=action.getAttribute('data-id'),type=action.getAttribute('data-action');if(type==='like'){var pos=state.liked.indexOf(id);if(pos>-1)state.liked.splice(pos,1);else state.liked.push(id);save();render()}else if(type==='like-comment'){var cpos=state.likedComments.indexOf(id);if(cpos>-1)state.likedComments.splice(cpos,1);else state.likedComments.push(id);save();render()}else if(type==='comments'){openComments[id]=!openComments[id];render()}else if(type==='delete-comment'){if(window.confirm('Xoá bình luận này?')){state.comments=state.comments.filter(function(item){return item.id!==id});state.likedComments=state.likedComments.filter(function(cid){return cid!==id});save();render()}}return}
   if(event.target.closest('a[href="#"]'))event.preventDefault();
 });
 document.addEventListener('submit',function(event){
   var form=event.target;if(form.id==='composer-form'){event.preventDefault();var title=form.elements.title.value.trim(),body=form.elements.body.value.trim();if(!body)return;state.posts.unshift({id:uid('p'),author:'Bạn đọc HPZ',title:title,body:body,likes:0,t:Date.now()});save();form.reset();modal(false);render();return}
-  var postId=form.getAttribute('data-comment');if(postId){event.preventDefault();var text=form.elements.body.value.trim();if(!text)return;state.comments.push({id:uid('c'),post:postId,author:'Bạn đọc HPZ',body:text,t:Date.now()});save();openComments[postId]=true;render()}
+  var postId=form.getAttribute('data-comment');if(postId){event.preventDefault();var text=form.elements.body.value.trim();if(!text)return;state.comments.push({id:uid('c'),post:postId,author:'Bạn đọc HPZ',body:text,likes:0,t:Date.now()});save();openComments[postId]=true;render()}
 });
 $('open-composer').addEventListener('click',function(){modal(true)});$('close-composer').addEventListener('click',function(){modal(false)});$('cancel-composer').addEventListener('click',function(){modal(false)});$('composer-backdrop').addEventListener('click',function(event){if(event.target===this)modal(false)});document.addEventListener('keydown',function(event){if(event.key==='Escape')modal(false)});
 
