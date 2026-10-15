@@ -1,10 +1,43 @@
 (function(){
 'use strict';
 var STORE='hpz-community-hpzfull-v1';
-var ASSET='https://raw.githubusercontent.com/duyfelix1205-cell/hpzfull/main/frontend/public/assets/hpz/scene/';
 var TOPICS={benh:'Bệnh của cá',nuoc:'Chăm sóc nước',setup:'Set up bể mới',kythuat:'Kỹ thuật bể',ca:'Chọn & nuôi cá',hoidap:'Hỏi đáp chung'};
 var currentTopic='all';
 var $=function(id){return document.getElementById(id)};
+/* Static surfaces; no canvas animation or scene asset loading. */
+var staticStyle=document.createElement('style');staticStyle.id='hpz-static-theme';
+staticStyle.textContent=`
+:root{--hpz-navy-950:#08131F;--hpz-navy-900:#08131F;--hpz-navy-800:#122638;--hpz-text:#EAF2F8;--hpz-text-soft:#B6C6D4;--hpz-text-muted:#B6C6D4;--hpz-surface:#122638;--hpz-surface-2:#193448;--hpz-line:#294457;--hpz-cyan:#54C7E8;--hpz-cyan-2:#54C7E8;--hpz-shadow:none;--hpz-shadow-strong:none}
+html,body,.hpz-app{background:#08131F!important;color:#EAF2F8}
+#aquarium-bg,#aquarium-bg canvas{display:none!important}
+.hpz-app::before{display:none!important;content:none}
+.hpz-header,.hpz-footer,.hpz-bottom-nav{background:#08131F!important;border-color:#294457;box-shadow:none;backdrop-filter:none}
+.hpz-card,.hpz-card--hero,.hpz-side,.hpz-modal,.hpz-more-nav__panel,.hpz-mobile-menu__panel{background:#122638!important;border-color:#294457;box-shadow:none;backdrop-filter:none}
+.hpz-page-head{background:none}
+.hpz-page-head p,.hpz-modal__subtitle,.hpz-side__section>summary{color:#B6C6D4}
+.hpz-community-post__body,.hpz-community-comments__item p{color:#EAF2F8}
+.hpz-community-post__author small,.hpz-community-comments__item small{color:#B6C6D4}
+.hpz-community-comments__item{border-bottom-color:#294457}
+.hpz-community-post__meta{flex-wrap:wrap;align-items:center}
+.hpz-status{background:#193448;color:#B9EAF7;border-color:#35566C}
+.hpz-side__item:hover,.hpz-side__item[aria-current="true"]{background:#193448}
+.hpz-side__icon,.hpz-side__count{background:#193448}
+.hpz-side__count{color:#B6C6D4}
+.hpz-header__nav a:hover,.hpz-header__nav a.active,.hpz-account-link:hover,.hpz-icon-link:hover,.hpz-more-nav summary:hover,.hpz-mobile-menu summary:hover,.hpz-more-nav__panel a:hover,.hpz-mobile-menu__panel a:hover,.hpz-mobile-menu__panel a.active{background:#122638}
+.hpz-brand__mark{background:#122638;border-color:#54C7E8;box-shadow:none}
+.hpz-brand b{background:none;color:#EAF2F8;-webkit-background-clip:border-box;background-clip:border-box}
+.hpz-btn--primary,.hpz-modal__mark{background:#54C7E8;color:#08131F!important;box-shadow:none}
+.hpz-btn--secondary{background:#193448;border-color:#294457}
+.hpz-field input,.hpz-field textarea,.hpz-field select,.hpz-field select option{background:#08131F;color:#EAF2F8;border-color:#294457}
+.hpz-field>span{color:#B6C6D4}
+.hpz-field input::placeholder,.hpz-field textarea::placeholder{color:#B6C6D4;opacity:.8}
+.hpz-field input:focus,.hpz-field textarea:focus,.hpz-field select:focus{border-color:#54C7E8}
+.hpz-empty{background:#122638;border-color:#294457}
+.hpz-modal-backdrop{background:rgba(8,19,31,.85);backdrop-filter:none}
+.hpz-bottom-nav a:active{background:#193448}
+`;
+document.head.appendChild(staticStyle);
+var themeColor=document.querySelector('meta[name="theme-color"]');if(themeColor)themeColor.content='#08131F';
 function ago(minutes){return Date.now()-minutes*60000}
 function seed(){return{me:'ban_doc',posts:[
   {id:'p1',topic:'setup',author:'Minh Thủy',title:'Bể 60cm đầu tiên: nên chọn layout nào cho người mới?',body:'Mình chuẩn bị setup bể 60x30x36, có sẵn vài viên đá seiryu và một cây lũa nhỏ. Mọi người cho mình xin ý kiến nên chọn layout tam giác hay đảo?',likes:47,t:ago(95)},
@@ -89,19 +122,5 @@ document.addEventListener('submit',function(event){
   var postId=form.getAttribute('data-comment');if(postId){event.preventDefault();var text=form.elements.body.value.trim();if(!text)return;state.comments.push({id:uid('c'),post:postId,author:'Bạn đọc HPZ',body:text,likes:0,t:Date.now()});save();openComments[postId]=true;render()}
 });
 $('open-composer').addEventListener('click',function(){modal(true)});$('close-composer').addEventListener('click',function(){modal(false)});$('cancel-composer').addEventListener('click',function(){modal(false)});$('composer-backdrop').addEventListener('click',function(event){if(event.target===this)modal(false)});document.addEventListener('keydown',function(event){if(event.key==='Escape')modal(false)});
-
-function aquarium(){
-  var host=$('aquarium-bg'),reduce=matchMedia('(prefers-reduced-motion: reduce)').matches,mobile=innerWidth<760||/Mobi|Android/i.test(navigator.userAgent),canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');host.appendChild(canvas);
-  var names=['fish_blue','fish_brown','fish_green','fish_grey','fish_grey_long_a','fish_grey_long_b','fish_orange','fish_pink','fish_red'],bubbleNames=['bubble_a','bubble_b','bubble_c'],images={},W=0,H=0,dpr=1,last=performance.now(),start=last,raf=0;
-  names.concat(bubbleNames).forEach(function(name){var image=new Image();image.crossOrigin='anonymous';image.src=ASSET+name+'.png';images[name]=image});
-  function rand(a,b){return a+Math.random()*(b-a)}function pick(list){return list[Math.floor(Math.random()*list.length)]}
-  var fish=Array.from({length:mobile?8:15},function(){return{name:pick(names),x:rand(-200,innerWidth+200),y:rand(.08,.88),dir:Math.random()<.5?1:-1,depth:rand(.25,1),phase:rand(0,Math.PI*2),speed:rand(22,72),bob:rand(5,13)}}),bubbles=Array.from({length:mobile?18:38},function(){return{name:pick(bubbleNames),x:Math.random(),y:Math.random(),speed:rand(14,52),size:rand(9,25),phase:rand(0,6.28)}}),dust=Array.from({length:mobile?40:95},function(){return{x:Math.random(),y:Math.random(),r:rand(.5,1.8),a:rand(.06,.25),s:rand(2,8),p:rand(0,6.28)}}),rays=Array.from({length:mobile?4:8},function(){return{x:Math.random(),w:rand(65,180),a:rand(.025,.075),p:rand(0,6.28)}});
-  function resize(){dpr=Math.min(devicePixelRatio||1,mobile?1.4:2);W=innerWidth;H=innerHeight;canvas.width=Math.round(W*dpr);canvas.height=Math.round(H*dpr);canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
-  function sprite(name,x,y,w,h,flip,alpha,rotation){var image=images[name];if(!image||!image.complete||!image.naturalWidth)return;ctx.save();ctx.globalAlpha=alpha;ctx.translate(x,y);ctx.rotate(rotation||0);ctx.scale(flip?-1:1,1);ctx.drawImage(image,-w/2,-h/2,w,h);ctx.restore()}
-  function frame(now){var dt=Math.min(.05,(now-last)/1000)||.016,elapsed=(now-start)/1000;last=now;var depth=Math.min(1,scrollY/Math.max(900,document.documentElement.scrollHeight-innerHeight));var gradient=ctx.createLinearGradient(0,0,0,H);gradient.addColorStop(0,'rgb('+(16-9*depth|0)+','+(80-50*depth|0)+','+(126-76*depth|0)+')');gradient.addColorStop(.46,'rgb('+(11-5*depth|0)+','+(63-31*depth|0)+','+(102-50*depth|0)+')');gradient.addColorStop(1,'rgb('+(5-2*depth|0)+','+(37-20*depth|0)+','+(61-28*depth|0)+')');ctx.fillStyle=gradient;ctx.fillRect(0,0,W,H);
-    ctx.save();ctx.globalCompositeOperation='lighter';rays.forEach(function(ray){var x=ray.x*W+Math.sin(elapsed*.11+ray.p)*45,g=ctx.createLinearGradient(x,0,x+ray.w*.35,H*.72);g.addColorStop(0,'rgba(180,235,255,'+(ray.a*(1-depth*.65))+')');g.addColorStop(1,'rgba(100,190,230,0)');ctx.fillStyle=g;ctx.beginPath();ctx.moveTo(x-ray.w/2,0);ctx.lineTo(x+ray.w/2,0);ctx.lineTo(x+ray.w*.78,H*.72);ctx.lineTo(x-ray.w*.22,H*.72);ctx.closePath();ctx.fill()});ctx.restore();
-    dust.forEach(function(item){item.y-=item.s*dt/H;if(item.y<0)item.y=1;ctx.fillStyle='rgba(210,240,250,'+item.a+')';ctx.beginPath();ctx.arc(item.x*W+Math.sin(elapsed*.18+item.p)*7,item.y*H-scrollY*.015,item.r,0,Math.PI*2);ctx.fill()});bubbles.forEach(function(item){item.y-=item.speed*dt/H;if(item.y<-.08){item.y=1.05;item.x=Math.random()}sprite(item.name,item.x*W+Math.sin(elapsed*.7+item.phase)*10,item.y*H,item.size,item.size,false,.48,0)});fish.forEach(function(item){item.x+=item.speed*item.dir*dt;if(item.dir>0&&item.x>W+170)item.x=-170;if(item.dir<0&&item.x<-170)item.x=W+170;var y=item.y*H+Math.sin(elapsed*(.7+item.depth)+item.phase)*item.bob-scrollY*(.01+.035*item.depth),w=(55+105*item.depth)*(mobile?.76:1);sprite(item.name,item.x,y,w,w*.56,item.dir<0,.36+.55*item.depth,Math.sin(elapsed*5+item.phase)*.025)});raf=requestAnimationFrame(frame)}
-  resize();addEventListener('resize',resize);raf=requestAnimationFrame(frame);if(reduce)canvas.style.opacity='.92'
-}
-render();aquarium();
+render();
 })();
